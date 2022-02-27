@@ -249,6 +249,22 @@ void get_battery_bar(json_object *output[2], char *battery) {
 	
 	percent = ((float)charge_level / (float)charge_full) * 100;
 	
+	for (int i = 0; i < (int)(percent / 10); i++) {
+		strcat(output_str1, " ");
+	}
+	for (int i = 0; i < 10 - strlen(output_str1); i++) {
+		strcat(output_str2, " ");
+	}
 	
+	output[0] = white_text(" ");
+	json_object_object_add(output[0], "background", json_object_new_string("#7f7f7f"));
+	json_object_object_add(output[0], "border", json_object_new_string("#ffffff"));
+	json_object_object_add(output[0], "border_right", json_object_new_int(0));
+	
+	output[1] = white_text(" ");
+	json_object_object_add(output[1], "border", json_object_new_string("#ffffff"));
+	json_object_object_add(output[1], "border_left", json_object_new_int(0));
+	
+	return;
 }
 #endif
