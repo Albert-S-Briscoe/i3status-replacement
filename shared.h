@@ -17,4 +17,10 @@
 #define IPOFFSET 0
 #endif
 
+#ifdef NETINTERFACE2
+#define IPOFFSET2 2
+#else
+#define IPOFFSET2 0
+#endif
+
 #endif

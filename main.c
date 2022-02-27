@@ -27,6 +27,10 @@ int main (int argc, char *argv[]) {
 	json_object_array_add(status_json, get_ip(NETINTERFACE));
 	json_object_array_add(status_json, separator);
 #endif
+#ifdef NETINTERFACE2
+	json_object_array_add(status_json, get_ip(NETINTERFACE2));
+	json_object_array_add(status_json, separator);
+#endif
 #if BATTERIES > 0
 	json_object_array_add(status_json, get_battery("BAT0"));
 	json_object_array_add(status_json, separator);
@@ -55,28 +59,29 @@ int main (int argc, char *argv[]) {
 	status_length = json_object_array_length(status_json);
 	
 	while (1) {
-		for (int i = 0; i < 30; i++) {
-			// every 30 seconds
-			if (i == 0) {
-				get_ssh(sshblocks);
-				json_object_array_put_idx(status_json, 0, sshblocks[0]);
-				json_object_array_put_idx(status_json, 1, sshblocks[1]);
+		// every 30 seconds
+		get_ssh(sshblocks);
+		json_object_array_put_idx(status_json, 0, sshblocks[0]);
+		json_object_array_put_idx(status_json, 1, sshblocks[1]);
 #ifdef NETINTERFACE
-				json_object_array_put_idx(status_json, 2, get_ip("wlan0"));
+		json_object_array_put_idx(status_json, 2, get_ip(NETINTERFACE));
 #endif
-			}
-			
+#ifdef NETINTERFACE2
+		json_object_array_put_idx(status_json, 2 + IPOFFSET, get_ip(NETINTERFACE2));
+#endif
+		
+		for (int i = 0; i < 30; i++) {
 			// every 10 seconds
 			if (i % 10 == 0) {
 #if BATTERIES > 0
-				json_object_array_put_idx(status_json, 2 + IPOFFSET, get_battery("BAT0"));
+				json_object_array_put_idx(status_json, 2 + IPOFFSET + IPOFFSET2, get_battery("BAT0"));
 #endif
 #if BATTERIES > 1
-				json_object_array_put_idx(status_json, 4 + IPOFFSET, get_battery("BAT1"));
+				json_object_array_put_idx(status_json, 4 + IPOFFSET + IPOFFSET2, get_battery("BAT1"));
 #endif
 				
-				json_object_array_put_idx(status_json, 2 + (BATTERIES * 2) + IPOFFSET, get_fs("/"));
-				json_object_array_put_idx(status_json, 4 + (BATTERIES * 2) + IPOFFSET, get_fs("/home"));
+				json_object_array_put_idx(status_json, 2 + (BATTERIES * 2) + IPOFFSET + IPOFFSET2, get_fs("/"));
+				json_object_array_put_idx(status_json, 4 + (BATTERIES * 2) + IPOFFSET + IPOFFSET2, get_fs("/home"));
 				
 #ifdef RAMSUMMARY
 				json_object_array_put_idx(status_json, status_length - 2, get_mem_info());
