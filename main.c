@@ -3,6 +3,9 @@
 #include "main.h"
 
 int main (int argc, char *argv[]) {
+//	get_battery_bar("../../../home/main/src/i3status-replacement/battery");
+	
+	
 	int status_length;
 	json_object *sshblocks[2];
 	
@@ -27,13 +30,14 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "error");
 	
 	json_object *separator = white_text(" | ");
+	json_object *placeholder = white_text("");
 	
 	
 //	get_battery_bar(batterybar, "BAT0");
 #ifdef BATTERYBAR
-	json_object_array_add(status_json, white_text(" "));//batterybar[0]);
-	json_object_array_add(status_json, white_text(" "));//batterybar[1]);
-	json_object_array_add(status_json, separator);
+	json_object_array_add(status_json, placeholder);// batterybar[0]
+//	json_object_array_add(status_json, placeholder);// batterybar[1]
+	json_object_array_add(status_json, white_text(") | "));
 #endif
 	get_ssh(sshblocks);
 	json_object_array_add(status_json, sshblocks[0]);
@@ -73,8 +77,8 @@ int main (int argc, char *argv[]) {
 	// update length every time it's changed. Not sure exactly how that'll work at the moment.
 	status_length = json_object_array_length(status_json);
 	
-	fprintf(stdout, "%s,\n", json_object_to_json_string(status_json));
-	fflush(stdout);
+//	fprintf(stdout, "%s,\n", json_object_to_json_string(status_json));
+//	fflush(stdout);
 	
 	while (1) {
 		// every 30 seconds
@@ -92,9 +96,10 @@ int main (int argc, char *argv[]) {
 			// every 10 seconds
 			if (i % 10 == 0) {
 #ifdef BATTERYBAR
-				get_battery_bar(batterybar, "BAT0");
-				json_object_array_put_idx(status_json, 0, batterybar[0]);
-				json_object_array_put_idx(status_json, 1, batterybar[1]);
+//				get_battery_bar(batterybar, "BAT0");
+//				json_object_array_put_idx(status_json, 0, batterybar[0]);
+//				json_object_array_put_idx(status_json, 1, batterybar[1]);
+				json_object_array_put_idx(status_json, 0, get_battery_bar("BAT0"));
 #endif
 				
 #if BATTERIES > 0

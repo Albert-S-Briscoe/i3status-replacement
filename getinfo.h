@@ -15,7 +15,7 @@ extern json_object *get_battery(char *battery);
 #endif
 
 #ifdef BATTERYBAR
-extern void get_battery_bar(json_object *output[2], char *battery);
+extern json_object *get_battery_bar(char *battery);
 #endif
 
 extern json_object *get_time();

@@ -24,7 +24,7 @@
 #endif
 
 #ifdef BATTERYBAR
-#define BATTERYBAROFFSET 3
+#define BATTERYBAROFFSET 2
 #else
 #define BATTERYBAROFFSET 0
 #endif

@@ -213,65 +213,54 @@ json_object *get_battery(char *battery) {
 
 // experimental thingy showing battery level visually
 #ifdef BATTERYBAR
-void get_battery_bar(json_object *output[2], char *battery) {
+json_object *get_battery_bar(char *battery) {
 	FILE *file_var;
 	char file_path[100];
 	
 	int charge_full;
 	int charge_level;
+	int atzero = 1;
 	char state;
 	float percent;
 	
-	char output_str1[20] = "";
-	char output_str2[20] = "";
+	char tmp_str1[20] = "";
+	char tmp_str2[20] = "";
+	char output_str[100];
 	char *color;
 	
+	json_object *output;
 	
 	// get info from sysfs
 	sprintf(file_path, "/sys/class/power_supply/%s/charge_full", battery);
 	file_var = fopen(file_path, "r");
-	if (file_var == NULL) {
-		output[0] = error_text("N");
-		output[1] = white_text("");
-		return;
-	}
+	if (file_var == NULL)
+		return error_text("N");
 	fscanf(file_var, "%d", &charge_full);
 	fclose(file_var);
 	
 	sprintf(file_path, "/sys/class/power_supply/%s/charge_now", battery);
 	file_var = fopen(file_path, "r");
-	if (file_var == NULL) {
-		output[0] = error_text("N");
-		output[1] = white_text("");
-		return;
-	}
+	if (file_var == NULL)
+		return error_text("N");
 	fscanf(file_var, "%d", &charge_level);
 	fclose(file_var);
 	
 	sprintf(file_path, "/sys/class/power_supply/%s/status", battery);
 	file_var = fopen(file_path, "r");
-	if (file_var == NULL) {
-		output[0] = error_text("N");
-		output[1] = white_text("");
-		return;
-	}
+	if (file_var == NULL)
+		return error_text("N");
 	state = fgetc(file_var);
 	fclose(file_var);
 	
 	percent = ((float)charge_level / (float)charge_full) * 100;
 	
-	sprintf(output_str1, "%c", state);
-	
-	for (int i = 0; i < (int)(percent / 10); i++)
-		strcat(output_str1, " ");
 	if (percent == 0)
-		output_str1[0] = '\0';
-	for (int i = 0; i < (11 - strlen(output_str1)); i++)
-		strcat(output_str2, " ");
-	if (percent == 0) {
-		output_str1[0] = '\0';
-		output_str2[0] = state;
-	}
+		atzero = 0;
+	
+	strcpy(tmp_str1, "           ");							// 11 zeros
+	tmp_str1[0] = state;										// make first char the state
+	strcpy(tmp_str2, tmp_str1 + (int)(percent / 10) + atzero);	// copy specified length of blank space to other string
+	tmp_str1[(int)(percent / 10) + atzero] = '\0';				// shorten first string to match where 2nd starts
 	
 	if (percent < 20)
 		color = "#7f0000"; // red if below 20%
@@ -282,7 +271,13 @@ void get_battery_bar(json_object *output[2], char *battery) {
 	else
 		color = "#7f7f7f"; // white if above 75
 	
-	output[0] = white_text(output_str1);
+	sprintf(output_str, "<span bgcolor=\"%s\">%s</span>%s", color, tmp_str1, tmp_str2);
+	
+	output = pango_text(output_str);
+	json_object_object_add(output, "border", json_object_new_string("#ffffff"));
+	return output;
+	
+	/*output[0] = white_text(output_str1);
 	json_object_object_add(output[0], "background", json_object_new_string(color));
 	json_object_object_add(output[0], "border", json_object_new_string("#ffffff"));
 	if (output_str2[0] == ' ')
@@ -291,8 +286,8 @@ void get_battery_bar(json_object *output[2], char *battery) {
 	output[1] = white_text(output_str2);
 	json_object_object_add(output[1], "border", json_object_new_string("#ffffff"));
 	if (output_str1[0] == ' ')
-		json_object_object_add(output[1], "border_left", json_object_new_int(0));
+		json_object_object_add(output[1], "border_left", json_object_new_int(0)); */
 	
-	return;
+	return error_text("unfinished");
 }
 #endif
