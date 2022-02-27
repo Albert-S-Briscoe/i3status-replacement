@@ -10,8 +10,11 @@ extern json_object *get_mem_info();
 extern void get_mem_info(json_object *output[3]);
 #endif
 
-extern json_object *get_time();
+#if BATTERIES > 0
 extern json_object *get_battery(char *battery);
+#endif
+
+extern json_object *get_time();
 extern json_object *get_fs(char *fs);
 
 #endif

@@ -1,6 +1,3 @@
-//#include <stdio.h>			// standard libraries
-//#include <stdlib.h>			//  ^
-//#include <string.h>			// strings
 #include <unistd.h>			// sleep()
 
 #include "main.h"
@@ -22,7 +19,6 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "error");
 	
 	json_object *separator = white_text(" | ");
-	
 	
 	get_ssh(sshblocks);
 	json_object_array_add(status_json, sshblocks[0]);
@@ -95,7 +91,7 @@ int main (int argc, char *argv[]) {
 			// every second
 			json_object_array_put_idx(status_json, status_length - 1, get_time());
 			
-			fprintf(stdout, "%s,\n", json_object_to_json_string_ext(status_json, JSON_C_TO_STRING_PRETTY));
+			fprintf(stdout, "%s,\n", json_object_to_json_string(status_json));
 			fflush(stdout);
 			
 			sleep(1);

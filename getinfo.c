@@ -11,7 +11,6 @@ json_object *get_time() {
 	char utc_time_str[100];
 	char local_time_str[100];
 	struct tm *tmp;
-	
 	time_t unixtime = time(NULL);
 	
 	tmp = localtime(&unixtime);
@@ -69,9 +68,9 @@ void get_mem_info(json_object *output[3]) {
 	fflush(stdout);
 	
 #ifdef CHECKSWAP
-#ifdef RAMSUMMARY
 	swapfreeperc = ((float)info.freeswap / (float)info.totalswap ) * 100;
 	
+#ifdef RAMSUMMARY
 	if (swapfreeperc < 95) {
 		usedswap = (info.totalswap - info.freeswap) * info.mem_unit / 1024;
 		
@@ -92,12 +91,11 @@ void get_mem_info(json_object *output[3]) {
 #endif
 #endif
 	
-	
 	if (memperc < 10)
 		color = "#ffffff"; // white if less than 10%
 	else if (memperc < 90)
 		color = "#00ff00"; // green if less than 90% and greater than 10%
-#ifndef CHECKSWAP
+#ifdef CHECKSWAP
 	else
 		color = "#ffff00"; // orange if greater than 90%
 #else
