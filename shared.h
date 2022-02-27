@@ -23,4 +23,10 @@
 #define IPOFFSET2 0
 #endif
 
+#ifdef BATTERYBAR
+#define BATTERYBAROFFSET 3
+#else
+#define BATTERYBAROFFSET 0
+#endif
+
 #endif

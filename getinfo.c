@@ -219,10 +219,11 @@ void get_battery_bar(json_object *output[2], char *battery) {
 	
 	int charge_full;
 	int charge_level;
+	char state;
 	float percent;
 	
-	char output_str1[20];
-	char output_str2[20];
+	char output_str1[20] = "";
+	char output_str2[20] = "";
 	char *color;
 	
 	
@@ -247,23 +248,50 @@ void get_battery_bar(json_object *output[2], char *battery) {
 	fscanf(file_var, "%d", &charge_level);
 	fclose(file_var);
 	
+	sprintf(file_path, "/sys/class/power_supply/%s/status", battery);
+	file_var = fopen(file_path, "r");
+	if (file_var == NULL) {
+		output[0] = error_text("N");
+		output[1] = white_text("");
+		return;
+	}
+	state = fgetc(file_var);
+	fclose(file_var);
+	
 	percent = ((float)charge_level / (float)charge_full) * 100;
 	
-	for (int i = 0; i < (int)(percent / 10); i++) {
+	sprintf(output_str1, "%c", state);
+	
+	for (int i = 0; i < (int)(percent / 10); i++)
 		strcat(output_str1, " ");
-	}
-	for (int i = 0; i < 10 - strlen(output_str1); i++) {
+	if (percent == 0)
+		output_str1[0] = '\0';
+	for (int i = 0; i < (11 - strlen(output_str1)); i++)
 		strcat(output_str2, " ");
+	if (percent == 0) {
+		output_str1[0] = '\0';
+		output_str2[0] = state;
 	}
 	
-	output[0] = white_text(" ");
-	json_object_object_add(output[0], "background", json_object_new_string("#7f7f7f"));
-	json_object_object_add(output[0], "border", json_object_new_string("#ffffff"));
-	json_object_object_add(output[0], "border_right", json_object_new_int(0));
+	if (percent < 20)
+		color = "#7f0000"; // red if below 20%
+	else if (percent < 40)
+		color = "#7f7f00"; // orange if below 40 and above 20
+	else if (percent < 75)
+		color = "#007f00"; // green if above 40 and below 75
+	else
+		color = "#7f7f7f"; // white if above 75
 	
-	output[1] = white_text(" ");
+	output[0] = white_text(output_str1);
+	json_object_object_add(output[0], "background", json_object_new_string(color));
+	json_object_object_add(output[0], "border", json_object_new_string("#ffffff"));
+	if (output_str2[0] == ' ')
+		json_object_object_add(output[0], "border_right", json_object_new_int(0));
+	
+	output[1] = white_text(output_str2);
 	json_object_object_add(output[1], "border", json_object_new_string("#ffffff"));
-	json_object_object_add(output[1], "border_left", json_object_new_int(0));
+	if (output_str1[0] == ' ')
+		json_object_object_add(output[1], "border_left", json_object_new_int(0));
 	
 	return;
 }
