@@ -31,18 +31,19 @@ json_object *get_time() {
 }
 
 // get used ram and swap, change colors based on ram usage
-#ifdef RAMSUMMARY
 json_object *get_mem_info() {
-#else
-void get_mem_info(json_object *output[3]) {
-#endif
 	struct sysinfo info;
 	long long int usedram; // the calculation for this is working with ram in bytes, and the unsigned int limit is about 4gib. 8eib should be enough for a while.
 	long long int available;
 	long long int freeram;
 	float memperc;
-	char line[200];
+	char line[250];
 	char *color;
+#ifndef MEMSUMMARY
+	char used_str[50];
+	char free_str[50];
+	char avail_str[50];
+#endif
 #ifdef CHECKSWAP
 	long long int usedswap;
 	float swapfreeperc;
@@ -110,13 +111,11 @@ void get_mem_info(json_object *output[3]) {
 	sprintf(line, "RAM %.1f%% (%s)", memperc, format_memory((double)usedram));
 	return color_text(line, color);
 #else
-	sprintf(line, "Used: %s", format_memory((double)usedram));
-	output[0] = color_text(line, color);
-	sprintf(line, "Free: %s", format_memory((double)freeram));
-	output[1] = color_text(line, color);
-	sprintf(line, "Avail.: %s", format_memory((double)available));
-	output[2] = color_text(line, color);
-	return;
+	strcpy(used_str, format_memory((double)usedram));
+	strcpy(free_str, format_memory((double)freeram));
+	strcpy(avail_str, format_memory((double)available));
+	sprintf(line, "<span color=\"%1$s\">Used: %2$s</span> | <span color=\"%1$s\">Free: %3$s</span> | <span color=\"%1$s\">Avail.: %4$s</span>", color, used_str, free_str, avail_str);
+	return pango_text(line);
 #endif
 }
 

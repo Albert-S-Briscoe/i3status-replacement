@@ -4,10 +4,10 @@
 // number of batteries to show, max 2, 0 to disable.
 #define BATTERIES 2
 
-// print less extra spaces if defined, only changes ram and storage at the moment.
+// print less extra spaces if defined, only changes ram and storage at the moment. comment out to keep spaces.
 #define SMALLSCREEN 1
 
-// summarize ram if defined, full "Used: X | Free: X | Avail.: X" feilds if undefined.
+// summarize ram if defined, full "Used: X | Free: X | Avail.: X" if undefined.
 #define RAMSUMMARY 1
 
 // define to enbale checking swap (and change color thresholds to seem more urgent if ram is almost full). This should not be defined while RAMSUMMARY is undefined, but all other configurations are valid.
@@ -27,7 +27,7 @@
 
 
 // Experimental:
-#define BATTERYBAR 1
+//#define BATTERYBAR 1
 //#define CLICKEVENTS 1
 
 #endif
