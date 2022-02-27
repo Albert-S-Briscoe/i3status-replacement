@@ -8,6 +8,7 @@
 extern json_object *white_text(char *text);
 extern json_object *error_text(char *text);
 extern json_object *color_text(char *text, char *color);
+extern json_object *pango_text(char *text);
 extern char *format_memory(double input);
 
 #endif

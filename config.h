@@ -27,7 +27,7 @@
 
 
 // Experimental:
-//#define BATTERYBAR 1
-
+#define BATTERYBAR 1
+//#define CLICKEVENTS 1
 
 #endif

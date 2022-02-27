@@ -69,3 +69,15 @@ json_object *color_text(char *text, char *color) {
 	
 	return text_json;
 }
+
+// text formatted with pango markup
+json_object *pango_text(char *text) {
+	json_object *text_json = json_object_new_object();
+	json_object_object_add(text_json, "full_text", json_object_new_string(text));
+//	json_object_object_add(text_json, "color", json_object_new_string("#ffffff"));
+//	json_object_object_add(text_json, "separator", json_object_new_boolean(0));
+	json_object_object_add(text_json, "separator_block_width", json_object_new_int(0));
+	json_object_object_add(text_json, "markup", json_object_new_string("pango"));
+	
+	return text_json;
+}

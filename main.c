@@ -15,7 +15,11 @@ int main (int argc, char *argv[]) {
 #endif
 	
 	// start infinite json
+#ifdef CLICKEVENTS
+	printf ("{\"version\":1,\"click_events\":true}\n[\n[],\n");
+#else
 	printf ("{\"version\":1}\n[\n[],\n");
+#endif
 	fflush(stdout);
 	
 	json_object *status_json = json_object_new_array();
@@ -29,7 +33,7 @@ int main (int argc, char *argv[]) {
 #ifdef BATTERYBAR
 	json_object_array_add(status_json, white_text(" "));//batterybar[0]);
 	json_object_array_add(status_json, white_text(" "));//batterybar[1]);
-	json_object_array_add(status_json, white_text(") | "));
+	json_object_array_add(status_json, separator);
 #endif
 	get_ssh(sshblocks);
 	json_object_array_add(status_json, sshblocks[0]);
