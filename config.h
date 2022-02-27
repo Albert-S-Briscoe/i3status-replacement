@@ -4,6 +4,12 @@
 // number of batteries to show, max 2, 0 to disable.
 #define BATTERIES 2
 
+// define to show battery percentage over a battery icon with colored level. comment out to just show percent and state.
+#define BATTERYBAR 1
+
+// define to shorten the battery icon by about 1/4.
+//#define SHORTBATTERY 1
+
 // print less extra spaces if defined, only changes ram and storage at the moment. comment out to keep spaces.
 #define SMALLSCREEN 1
 
@@ -27,7 +33,8 @@
 
 
 // Experimental:
-//#define BATTERYBAR 1
+
+// unused currently
 //#define CLICKEVENTS 1
 
 #endif

@@ -151,6 +151,12 @@ json_object *get_battery(char *battery) {
 	char output_str[100];
 	char *color;
 	
+#ifdef BATTERYBAR
+	int atzero = 1;
+	char tmp_str1[20] = "";
+	char tmp_str2[20] = "";
+	json_object *output;
+#endif
 	
 	// get info from sysfs
 	sprintf(file_path, "/sys/class/power_supply/%s/charge_full", battery);
@@ -176,7 +182,42 @@ json_object *get_battery(char *battery) {
 	
 	percent = ((float)charge_level / (float)charge_full) * 100;
 	
-	// makes the "Unknown" status make more sense in certain cases and remove the percentage when full.
+	if (state == 'U') {
+		if (percent < 2)
+			state = 'E';
+		if (percent > 98)
+			state = 'F';
+	}
+	
+#ifdef BATTERYBAR
+	if (percent == 0)
+		atzero = 0;
+
+#ifdef SHORTBATTERY //F 100.0%
+	strcpy(tmp_str1, "        ");							// 8 zeros
+#else
+	strcpy(tmp_str1, "           ");							// 11 zeros
+#endif
+//	tmp_str1[0] = state;										// make the first char the state
+	sprintf(tmp_str2, "%c %.1f%%", state, percent);				// add percentage
+	strncpy(tmp_str1, tmp_str2, strlen(tmp_str2));				// add percentage
+	
+#ifdef SHORTBATTERY
+	strcpy(tmp_str2, tmp_str1 + (int)(percent / 14) + atzero);	// copy specified length of blank space to other string
+	tmp_str1[(int)(percent / 14) + atzero] = '\0';				// shorten first string to match where 2nd starts
+#else
+	strcpy(tmp_str2, tmp_str1 + (int)(percent / 10) + atzero);	// copy specified length of blank space to other string
+	tmp_str1[(int)(percent / 10) + atzero] = '\0';				// shorten first string to match where 2nd starts
+#endif
+
+#else
+	
+	if (state == 'E')
+		return color_text("Empty", "#bfbfbf");
+	if (state == 'F')
+		return white_text("Full");
+	
+/*	// makes the "Unknown" status make more sense in certain cases and remove the percentage when full.
 	switch (state) {
 		case 'U':
 			switch (battery[3]) {
@@ -194,6 +235,8 @@ json_object *get_battery(char *battery) {
 			return white_text("Full");
 	}
 	// woah, while looking at this section of the code I just had Deja Vu, and then Deja Vu of having Deja Vu
+*/
+#endif
 	
 	if (percent < 20)
 		color = "#ff0000"; // red if below 20%
@@ -204,89 +247,16 @@ json_object *get_battery(char *battery) {
 	else
 		color = "#ffffff"; // white if above 75
 	
+#ifdef BATTERYBAR
+	sprintf(output_str, "<span bgcolor=\"%s7f\">%s</span>%s", color, tmp_str1, tmp_str2);
+	
+	output = pango_text(output_str);
+	json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
+	return output;
+#else
 	sprintf(output_str, "%c %.1f%%", state, percent);
 	
 	return color_text(output_str, color);
-}
 #endif
-
-// experimental thingy showing battery level visually
-#ifdef BATTERYBAR
-json_object *get_battery_bar(char *battery) {
-	FILE *file_var;
-	char file_path[100];
-	
-	int charge_full;
-	int charge_level;
-	int atzero = 1;
-	char state;
-	float percent;
-	
-	char tmp_str1[20] = "";
-	char tmp_str2[20] = "";
-	char output_str[100];
-	char *color;
-	
-	json_object *output;
-	
-	// get info from sysfs
-	sprintf(file_path, "/sys/class/power_supply/%s/charge_full", battery);
-	file_var = fopen(file_path, "r");
-	if (file_var == NULL)
-		return error_text("N");
-	fscanf(file_var, "%d", &charge_full);
-	fclose(file_var);
-	
-	sprintf(file_path, "/sys/class/power_supply/%s/charge_now", battery);
-	file_var = fopen(file_path, "r");
-	if (file_var == NULL)
-		return error_text("N");
-	fscanf(file_var, "%d", &charge_level);
-	fclose(file_var);
-	
-	sprintf(file_path, "/sys/class/power_supply/%s/status", battery);
-	file_var = fopen(file_path, "r");
-	if (file_var == NULL)
-		return error_text("N");
-	state = fgetc(file_var);
-	fclose(file_var);
-	
-	percent = ((float)charge_level / (float)charge_full) * 100;
-	
-	if (percent == 0)
-		atzero = 0;
-	
-	strcpy(tmp_str1, "           ");							// 11 zeros
-	tmp_str1[0] = state;										// make first char the state
-	strcpy(tmp_str2, tmp_str1 + (int)(percent / 10) + atzero);	// copy specified length of blank space to other string
-	tmp_str1[(int)(percent / 10) + atzero] = '\0';				// shorten first string to match where 2nd starts
-	
-	if (percent < 20)
-		color = "#7f0000"; // red if below 20%
-	else if (percent < 40)
-		color = "#7f7f00"; // orange if below 40 and above 20
-	else if (percent < 75)
-		color = "#007f00"; // green if above 40 and below 75
-	else
-		color = "#7f7f7f"; // white if above 75
-	
-	sprintf(output_str, "<span bgcolor=\"%s\">%s</span>%s", color, tmp_str1, tmp_str2);
-	
-	output = pango_text(output_str);
-	json_object_object_add(output, "border", json_object_new_string("#ffffff"));
-	return output;
-	
-	/*output[0] = white_text(output_str1);
-	json_object_object_add(output[0], "background", json_object_new_string(color));
-	json_object_object_add(output[0], "border", json_object_new_string("#ffffff"));
-	if (output_str2[0] == ' ')
-		json_object_object_add(output[0], "border_right", json_object_new_int(0));
-	
-	output[1] = white_text(output_str2);
-	json_object_object_add(output[1], "border", json_object_new_string("#ffffff"));
-	if (output_str1[0] == ' ')
-		json_object_object_add(output[1], "border_left", json_object_new_int(0)); */
-	
-	return error_text("unfinished");
 }
 #endif

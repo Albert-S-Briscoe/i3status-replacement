@@ -24,9 +24,9 @@
 #endif
 
 #ifdef BATTERYBAR
-#define BATTERYBAROFFSET 2
+#define BATTERYSEP (white_text(") | "))
 #else
-#define BATTERYBAROFFSET 0
+#define BATTERYSEP (separator)
 #endif
 
 #endif
