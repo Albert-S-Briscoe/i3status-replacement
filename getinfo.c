@@ -210,3 +210,45 @@ json_object *get_battery(char *battery) {
 	return color_text(output_str, color);
 }
 #endif
+
+// experimental thingy showing battery level visually
+#ifdef BATTERYBAR
+void get_battery_bar(json_object *output[2], char *battery) {
+	FILE *file_var;
+	char file_path[100];
+	
+	int charge_full;
+	int charge_level;
+	float percent;
+	
+	char output_str1[20];
+	char output_str2[20];
+	char *color;
+	
+	
+	// get info from sysfs
+	sprintf(file_path, "/sys/class/power_supply/%s/charge_full", battery);
+	file_var = fopen(file_path, "r");
+	if (file_var == NULL) {
+		output[0] = error_text("N");
+		output[1] = white_text("");
+		return;
+	}
+	fscanf(file_var, "%d", &charge_full);
+	fclose(file_var);
+	
+	sprintf(file_path, "/sys/class/power_supply/%s/charge_now", battery);
+	file_var = fopen(file_path, "r");
+	if (file_var == NULL) {
+		output[0] = error_text("N");
+		output[1] = white_text("");
+		return;
+	}
+	fscanf(file_var, "%d", &charge_level);
+	fclose(file_var);
+	
+	percent = ((float)charge_level / (float)charge_full) * 100;
+	
+	
+}
+#endif

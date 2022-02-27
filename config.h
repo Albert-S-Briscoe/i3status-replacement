@@ -26,4 +26,8 @@
 //#define SHOWINTERFACE 1
 
 
+// Experimental:
+#define BATTERYBAR 1
+
+
 #endif

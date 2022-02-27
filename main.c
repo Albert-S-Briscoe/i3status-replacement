@@ -20,6 +20,7 @@ int main (int argc, char *argv[]) {
 	
 	json_object *separator = white_text(" | ");
 	
+	
 	get_ssh(sshblocks);
 	json_object_array_add(status_json, sshblocks[0]);
 	json_object_array_add(status_json, sshblocks[1]);
@@ -57,6 +58,9 @@ int main (int argc, char *argv[]) {
 	
 	// update length every time it's changed. Not sure exactly how that'll work at the moment.
 	status_length = json_object_array_length(status_json);
+	
+	fprintf(stdout, "%s,\n", json_object_to_json_string(status_json));
+	fflush(stdout);
 	
 	while (1) {
 		// every 30 seconds
