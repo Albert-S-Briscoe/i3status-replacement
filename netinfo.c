@@ -16,7 +16,7 @@ functions to get network related info. I generally like this code less, so I put
 // I don't think I want to use this permanently, but whatever, I probably will. This took a while to figure out and it seems to work well, might as well use it.
 // lets me know when a ssh client is connected. if it's only one, shows the ip, if multiple, shows number of clients. also works for sftp.
 // just rewrote most of the 1am code.
-void get_ssh(json_object *blocks[2]) {
+json_object *get_ssh() {
 	char output_str[100];
 	int addrs = 0;
 	char addr[30];
@@ -25,8 +25,9 @@ void get_ssh(json_object *blocks[2]) {
 	FILE *pp;
 	pp = popen("ss -tn", "r");
 	if (pp == NULL) {
-		blocks[0] = white_text("");
-		blocks[1] = white_text("");
+		return white_text("");
+//		blocks[0] = white_text("");
+//		blocks[1] = white_text("");
 	}
 	while (1) {
 		char *line;
@@ -53,19 +54,20 @@ void get_ssh(json_object *blocks[2]) {
 	pclose(pp);
 	
 	if (addrs == 0) {
-		blocks[0] = white_text("");
-		blocks[1] = white_text("");
-		return;
+		return white_text("");
+//		blocks[0] = white_text("");
+//		blocks[1] = white_text("");
+//		return;
 	}
 	
 	if (addrs == 1)
-		sprintf(output_str, "SSH: %s", addr);
+		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %s</span> | ", addr);
 	else
-		sprintf(output_str, "SSH: %d addrs", addrs);
+		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %d addrs</span> | ", addrs);
 	
-	blocks[0] = color_text(output_str, "#ff7f00");
-	blocks[1] = white_text(" | ");
-	return;
+//	blocks[0] = color_text(output_str, "#ff7f00");
+//	blocks[1] = white_text(" | ");
+	return pango_text(output_str);
 }
 
 // copied most of this, basically no idea what's going on here, should be good enough tho

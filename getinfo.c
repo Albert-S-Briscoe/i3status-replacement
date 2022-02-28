@@ -155,7 +155,6 @@ json_object *get_battery(char *battery) {
 	int atzero = 1;
 	char tmp_str1[20] = "";
 	char tmp_str2[20] = "";
-	json_object *output;
 #endif
 	
 	// get info from sysfs
@@ -190,7 +189,7 @@ json_object *get_battery(char *battery) {
 	}
 	
 #ifdef BATTERYBAR
-	if (percent == 0)
+	if (percent < 2)
 		atzero = 0;
 
 #ifdef SHORTBATTERY //F 100.0%
@@ -199,7 +198,13 @@ json_object *get_battery(char *battery) {
 	strcpy(tmp_str1, "           ");							// 11 zeros
 #endif
 //	tmp_str1[0] = state;										// make the first char the state
-	sprintf(tmp_str2, "%c %.1f%%", state, percent);				// add percentage
+	
+	if (state == 'E')
+		strcpy(tmp_str2, "Empty");
+	else if (state == 'F')
+		strcpy(tmp_str2, "Full");
+	else
+		sprintf(tmp_str2, "%c %.1f%%", state, percent);				// add percentage
 	strncpy(tmp_str1, tmp_str2, strlen(tmp_str2));				// add percentage
 	
 #ifdef SHORTBATTERY
@@ -250,8 +255,9 @@ json_object *get_battery(char *battery) {
 #ifdef BATTERYBAR
 	sprintf(output_str, "<span bgcolor=\"%s7f\">%s</span>%s", color, tmp_str1, tmp_str2);
 	
-	output = pango_text(output_str);
+	json_object *output = pango_text(output_str);
 	json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
+		
 	return output;
 #else
 	sprintf(output_str, "%c %.1f%%", state, percent);

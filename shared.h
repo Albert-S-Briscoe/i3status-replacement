@@ -12,15 +12,13 @@
 
 
 #ifdef NETINTERFACE
-#define IPOFFSET 2
+	#ifdef NETINTERFACE2
+		#define IPOFFSET 4
+	#else
+		#define IPOFFSET 2
+	#endif
 #else
-#define IPOFFSET 0
-#endif
-
-#ifdef NETINTERFACE2
-#define IPOFFSET2 2
-#else
-#define IPOFFSET2 0
+	#define IPOFFSET 0
 #endif
 
 #ifdef BATTERYBAR
@@ -28,5 +26,6 @@
 #else
 #define BATTERYSEP (separator)
 #endif
+
 
 #endif
