@@ -24,11 +24,8 @@ json_object *get_ssh() {
 	// run `ss -tn` (lists all tcp connections) and get lines of stdout
 	FILE *pp;
 	pp = popen("ss -tn", "r");
-	if (pp == NULL) {
+	if (pp == NULL)
 		return white_text("");
-//		blocks[0] = white_text("");
-//		blocks[1] = white_text("");
-	}
 	while (1) {
 		char *line;
 		char buff[200];
@@ -53,20 +50,14 @@ json_object *get_ssh() {
 	}
 	pclose(pp);
 	
-	if (addrs == 0) {
+	if (addrs == 0)
 		return white_text("");
-//		blocks[0] = white_text("");
-//		blocks[1] = white_text("");
-//		return;
-	}
 	
 	if (addrs == 1)
 		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %s</span> | ", addr);
 	else
 		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %d addrs</span> | ", addrs);
 	
-//	blocks[0] = color_text(output_str, "#ff7f00");
-//	blocks[1] = white_text(" | ");
 	return pango_text(output_str);
 }
 

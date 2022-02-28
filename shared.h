@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <json-c/json.h>
 
-
 #include "config.h"
 #include "util.h"
 

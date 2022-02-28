@@ -197,14 +197,13 @@ json_object *get_battery(char *battery) {
 #else
 	strcpy(tmp_str1, "           ");							// 11 zeros
 #endif
-//	tmp_str1[0] = state;										// make the first char the state
 	
 	if (state == 'E')
 		strcpy(tmp_str2, "Empty");
 	else if (state == 'F')
 		strcpy(tmp_str2, "Full");
 	else
-		sprintf(tmp_str2, "%c %.1f%%", state, percent);				// add percentage
+		sprintf(tmp_str2, "%c %.1f%%", state, percent);			// add percentage
 	strncpy(tmp_str1, tmp_str2, strlen(tmp_str2));				// add percentage
 	
 #ifdef SHORTBATTERY
@@ -214,33 +213,12 @@ json_object *get_battery(char *battery) {
 	strcpy(tmp_str2, tmp_str1 + (int)(percent / 10) + atzero);	// copy specified length of blank space to other string
 	tmp_str1[(int)(percent / 10) + atzero] = '\0';				// shorten first string to match where 2nd starts
 #endif
-
-#else
 	
+#else
 	if (state == 'E')
 		return color_text("Empty", "#bfbfbf");
 	if (state == 'F')
 		return white_text("Full");
-	
-/*	// makes the "Unknown" status make more sense in certain cases and remove the percentage when full.
-	switch (state) {
-		case 'U':
-			switch (battery[3]) {
-				case '0': // main battery
-					if (percent > 95)
-						return white_text("Full");
-					break;
-				case '1': // slice battery
-					if (percent < 1)
-						return color_text("Empty", "#bfbfbf");
-					break;
-			}
-			break;
-		case 'F':
-			return white_text("Full");
-	}
-	// woah, while looking at this section of the code I just had Deja Vu, and then Deja Vu of having Deja Vu
-*/
 #endif
 	
 	if (percent < 20)
@@ -257,7 +235,6 @@ json_object *get_battery(char *battery) {
 	
 	json_object *output = pango_text(output_str);
 	json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
-		
 	return output;
 #else
 	sprintf(output_str, "%c %.1f%%", state, percent);
