@@ -75,6 +75,8 @@ int main (int argc, char *argv[]) {
 				json_object_array_put_idx(status_json, status_length - 2, get_mem_info());
 			}
 			
+			
+			
 			// every second
 			json_object_array_put_idx(status_json, status_length - 1, get_time());
 			

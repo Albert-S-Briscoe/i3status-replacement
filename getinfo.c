@@ -235,11 +235,13 @@ json_object *get_battery(char *battery) {
 	
 	json_object *output = pango_text(output_str);
 	json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
-	return output;
 #else
 	sprintf(output_str, "%c %.1f%%", state, percent);
 	
-	return color_text(output_str, color);
+	json_object *output = color_text(output_str, color);
 #endif
+	
+	json_object_object_add(output, "name", json_object_new_string("Battery"));
+	return output;
 }
 #endif

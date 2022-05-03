@@ -34,7 +34,7 @@
 
 // Experimental:
 
-// unused currently
-//#define CLICKEVENTS 1
+// receive click events from i3bar
+#define CLICKEVENTS 1
 
 #endif
