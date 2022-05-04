@@ -5,11 +5,8 @@
 
 #define PLACEHOLDER white_text("")
 
-#ifdef BATTERYBAR
-	#define BATTERYSEP white_text(") | ")
-#endif
-
 int main (int argc, char *argv[]) {
+	json_object *tempobject;
 	enum {
 		ssh_idx,
 #ifdef NETINTERFACE
@@ -20,16 +17,8 @@ int main (int argc, char *argv[]) {
 #endif
 // battery ifdef mess:
 #if BATTERIES > 0
-		bat1_idx,
-#ifdef BATTERYBAR
-		sep1_idx,
-#endif
-#if BATTERIES > 1
-		bat2_idx,
-#ifdef BATTERYBAR
-		sep2_idx,
-#endif
-#endif
+		bat_idx,
+		tmp_idx = bat_idx + (BATTERIES * OBJPERBAT) - 1,
 #endif
 		fs1_idx,
 		fs2_idx,
@@ -51,7 +40,7 @@ int main (int argc, char *argv[]) {
 		fprintf(stderr, "error");
 
 
-	// this mess basically just sets up the array and adds the seperator objects
+	// this mess basically just sets up the array and adds the separator objects
 	json_object_array_add(status_json, PLACEHOLDER);
 #ifdef NETINTERFACE
 	json_object_array_add(status_json, PLACEHOLDER);	// 1st network interface
@@ -59,29 +48,19 @@ int main (int argc, char *argv[]) {
 	json_object_array_add(status_json, PLACEHOLDER);	// 2nd network interface
 #endif
 #endif
-// battery ifdef mess:
-#if BATTERIES > 0
-	json_object_array_add(status_json, PLACEHOLDER);	// BAT0
+	for (int i = 0; i < BATTERIES; i++) {
+		json_object_array_add(status_json, PLACEHOLDER);
 #ifdef BATTERYBAR
-	json_object_array_add(status_json, BATTERYSEP);
+		json_object_array_add(status_json, white_text(") | "));
 #endif
-#if BATTERIES > 1
-	json_object_array_add(status_json, PLACEHOLDER);	// BAT1
-#ifdef BATTERYBAR
-	json_object_array_add(status_json, BATTERYSEP);
-#endif
-#endif
-#endif
+	}
 	json_object_array_add(status_json, PLACEHOLDER);	// get_fs("/")
 	json_object_array_add(status_json, PLACEHOLDER);	// get_fs("/home")
-	json_object_array_add(status_json, PLACEHOLDER);	// get_mem_info()	swap and warning on full memory/swap usage, built in seperators if not shortened
-	json_object_array_add(status_json, PLACEHOLDER);		// get_time()	built in seperators
+	json_object_array_add(status_json, PLACEHOLDER);	// get_mem_info()	swap and warning on full memory/swap usage, built in separators if not shortened
+	json_object_array_add(status_json, PLACEHOLDER);	// get_time()	built in separators
 
 	if (json_object_array_length(status_json) != total_idx)
 		fprintf(stderr, "error: array length does not match enum length");
-
-//	printf("%s,\n", json_object_to_json_string(status_json));
-//	fflush(stdout);
 
 	while (1) {
 		// every 30 seconds
@@ -96,10 +75,10 @@ int main (int argc, char *argv[]) {
 			// every 10 seconds
 			if (i % 10 == 0) {
 #if BATTERIES > 0
-				json_object_array_put_idx(status_json, bat1_idx, get_battery("BAT0"));
-#if BATTERIES > 1
-				json_object_array_put_idx(status_json, bat2_idx, get_battery("BAT1"));
-#endif
+				tempobject = get_battery();
+				for (int x = 0; i < json_object_array_length(tempobject); i++) {
+					json_object_array_put_idx(status_json, bat_idx + i * OBJPERBAT, json_object_array_get_idx(tempobject, i));
+				}
 #endif
 				json_object_array_put_idx(status_json, fs1_idx, get_fs("/"));
 				json_object_array_put_idx(status_json, fs2_idx, get_fs("/home"));

@@ -139,7 +139,9 @@ json_object *get_fs(char *fs) {
 }
 
 #if BATTERIES > 0
-json_object *get_battery(char *battery) {
+json_object *get_battery() {
+	json_object *objects = json_object_new_array();
+
 	FILE *file_var;
 	char file_path[100];
 
@@ -157,82 +159,103 @@ json_object *get_battery(char *battery) {
 	char tmp_str2[20] = "";
 #endif
 
-	// get info from sysfs
-	// update charge_full less often?
-	sprintf(file_path, "/sys/class/power_supply/%s/charge_full", battery);
-	file_var = fopen(file_path, "r");
-	if (file_var == NULL)
-		return color_text("N", "#7f7f7f");
-	fscanf(file_var, "%d", &charge_full);
-	fclose(file_var);
+	for (int i = 0; i < BATTERIES; i++) {
+		// get info from sysfs
+		// update charge_full less often?
+		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_full", i);
+		file_var = fopen(file_path, "r");
+		if (file_var == NULL) {
+#ifdef BATTERYBAR
+			json_object_array_add(objects, color_text("N", "#7f7f7f"));
+#else
+			json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
+#endif
+			continue;
+		}
+		fscanf(file_var, "%d", &charge_full);
+		fclose(file_var);
 
-	sprintf(file_path, "/sys/class/power_supply/%s/charge_now", battery);
-	file_var = fopen(file_path, "r");
-	if (file_var == NULL)
-		return color_text("N", "#7f7f7f");
-	fscanf(file_var, "%d", &charge_level);
-	fclose(file_var);
+		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_now", i);
+		file_var = fopen(file_path, "r");
+		if (file_var == NULL) {
+#ifdef BATTERYBAR
+			json_object_array_add(objects, color_text("N", "#7f7f7f"));
+#else
+			json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
+#endif
+			continue;
+		}
+		fscanf(file_var, "%d", &charge_level);
+		fclose(file_var);
 
-	sprintf(file_path, "/sys/class/power_supply/%s/status", battery);
-	file_var = fopen(file_path, "r");
-	if (file_var == NULL)
-		return color_text("N", "#7f7f7f");
-	state = fgetc(file_var);
-	fclose(file_var);
+		sprintf(file_path, "/sys/class/power_supply/BAT%d/status", i);
+		file_var = fopen(file_path, "r");
+		if (file_var == NULL) {
+#ifdef BATTERYBAR
+			json_object_array_add(objects, color_text("N", "#7f7f7f"));
+#else
+			json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
+#endif
+			continue;
+		}
+		state = fgetc(file_var);
+		fclose(file_var);
 
-	percent = ((float)charge_level / (float)charge_full) * 100;
+		percent = ((float)charge_level / (float)charge_full) * 100;
 
-	if (state == 'U') {
-		if (percent < 2)
-			state = 'E';
-		else if (percent > 98)
-			state = 'F';
-	}
+		if (state == 'U') {
+			if (percent < 2)
+				state = 'E';
+			else if (percent > 98)
+				state = 'F';
+		}
 
 #ifndef BATTERYBAR
-	if (state == 'E')
-		return color_text("Empty", "#bfbfbf");
-	if (state == 'F')
-		return white_text("Full");
+		if (state == 'E') {
+			json_object_array_add(objects, color_text("Empty", "#bfbfbf"));
+			continue;
+		}
+		if (state == 'F') {
+			json_object_array_add(objects, white_text("Full"));
+			continue;
+		}
 #endif
 
-	if (percent < 20)
-		color = "#ff0000"; // red if below 20%
-	else if (percent < 40)
-		color = "#ffff00"; // orange if below 40 and above 20
-	else if (percent < 75)
-		color = "#00ff00"; // green if above 40 and below 75
-	else
-		color = "#ffffff"; // white if above 75
+		if (percent < 20)
+			color = "#ff0000"; // red if below 20%
+		else if (percent < 40)
+			color = "#ffff00"; // orange if below 40 and above 20
+		else if (percent < 75)
+			color = "#00ff00"; // green if above 40 and below 75
+		else
+			color = "#ffffff"; // white if above 75
 
 #ifdef BATTERYBAR
-	charged_chars = (percent / BATDIVISOR);
-	if (percent > 2)
-		charged_chars += 1;
+		charged_chars = (percent / BATDIVISOR);
+		if (percent > 2)
+			charged_chars += 1;
 
-	if (state == 'E')
-		strcpy(tmp_str1, "Empty      ");
-	else if (state == 'F')
-		strcpy(tmp_str1, "Full       ");
-	else
-		sprintf(tmp_str1, "%c %.1f%%     ", state, percent);			// add percentage
+		if (state == 'E')
+			strcpy(tmp_str1, "Empty      ");
+		else if (state == 'F')
+			strcpy(tmp_str1, "Full       ");
+		else
+			sprintf(tmp_str1, "%c %.1f%%     ", state, percent);			// add percentage
 
-	tmp_str1[BATSTRLEN] = '\0';
-	strcpy(tmp_str2, tmp_str1 + charged_chars);	// copy specified length of blank space to other string
-	tmp_str1[charged_chars] = '\0';				// shorten first string to match where 2nd starts
+		tmp_str1[BATSTRLEN] = '\0';
+		strcpy(tmp_str2, tmp_str1 + charged_chars);	// copy specified length of blank space to other string
+		tmp_str1[charged_chars] = '\0';				// shorten first string to match where 2nd starts
 
-
-	sprintf(output_str, "<span bgcolor=\"%s7f\">%s</span>%s", color, tmp_str1, tmp_str2);
-	json_object *output = pango_text(output_str);
-	json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
+		sprintf(output_str, "<span bgcolor=\"%s7f\">%s</span>%s", color, tmp_str1, tmp_str2);
+		json_object *output = pango_text(output_str);
+		json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
 #else
-//	sprintf(output_str, "%c %.1f%%", state, percent);
-//	json_object *output = color_text(output_str, color);
-	sprintf(output_str, "<span color=\"%s\">%c %.1f%%</span> | ", color, state, percent);
-	json_object *output = pango_text(output_str);
+		sprintf(output_str, "<span color=\"%s\">%c %.1f%%</span> | ", color, state, percent);
+		json_object *output = pango_text(output_str);
 #endif
-
-	json_object_object_add(output, "name", json_object_new_string("Battery"));
-	return output;
+		json_object_object_add(output, "name", json_object_new_string("Battery"));
+		json_object_array_add(objects, output);
+	}
+	return objects;
 }
 #endif

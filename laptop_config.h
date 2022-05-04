@@ -1,7 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// Number of batteries to show, max 2, 0 to disable.
+// Number of batteries to show, 0 to disable. I am not aware of a maximum (100 works fine for me).
+// Any batteries that aren't connected/don't exist will show up as a grey 'N'.
 #define BATTERIES 2
 
 // Define to show battery percentage over a battery icon with colored level. Comment out to just show percent and state.
