@@ -1,10 +1,15 @@
-#include <unistd.h>			// sleep()
+#include <unistd.h>	// sleep()
 
 #include "main.h"
 
-int main (int argc, char *argv[]) {
-//	int status_length;
 
+#define PLACEHOLDER white_text("")
+
+#ifdef BATTERYBAR
+	#define BATTERYSEP white_text(") | ")
+#endif
+
+int main (int argc, char *argv[]) {
 	enum {
 		ssh_idx,
 #ifdef NETINTERFACE
@@ -13,12 +18,17 @@ int main (int argc, char *argv[]) {
 		net2_idx,
 #endif
 #endif
+// battery ifdef mess:
 #if BATTERIES > 0
 		bat1_idx,
+#ifdef BATTERYBAR
 		sep1_idx,
+#endif
 #if BATTERIES > 1
 		bat2_idx,
+#ifdef BATTERYBAR
 		sep2_idx,
+#endif
 #endif
 #endif
 		fs1_idx,
@@ -27,14 +37,6 @@ int main (int argc, char *argv[]) {
 		time_idx,
 		total_idx // array total, not an actual json object index
 	};
-
-	#define PLACEHOLDER white_text("")
-
-#ifdef BATTERYBAR
-	#define BATTERYSEP white_text(") | ")
-#else
-	#define BATTERYSEP separator
-#endif
 
 	// start infinite json
 #ifdef CLICKEVENTS
@@ -57,12 +59,17 @@ int main (int argc, char *argv[]) {
 	json_object_array_add(status_json, PLACEHOLDER);	// 2nd network interface
 #endif
 #endif
+// battery ifdef mess:
 #if BATTERIES > 0
 	json_object_array_add(status_json, PLACEHOLDER);	// BAT0
+#ifdef BATTERYBAR
 	json_object_array_add(status_json, BATTERYSEP);
+#endif
 #if BATTERIES > 1
 	json_object_array_add(status_json, PLACEHOLDER);	// BAT1
+#ifdef BATTERYBAR
 	json_object_array_add(status_json, BATTERYSEP);
+#endif
 #endif
 #endif
 	json_object_array_add(status_json, PLACEHOLDER);	// get_fs("/")

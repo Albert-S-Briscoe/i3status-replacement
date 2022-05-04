@@ -223,13 +223,13 @@ json_object *get_battery(char *battery) {
 
 
 	sprintf(output_str, "<span bgcolor=\"%s7f\">%s</span>%s", color, tmp_str1, tmp_str2);
-
 	json_object *output = pango_text(output_str);
 	json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
 #else
-	sprintf(output_str, "%c %.1f%%", state, percent);
-
-	json_object *output = color_text(output_str, color);
+//	sprintf(output_str, "%c %.1f%%", state, percent);
+//	json_object *output = color_text(output_str, color);
+	sprintf(output_str, "<span color=\"%s\">%c %.1f%%</span> | ", color, state, percent);
+	json_object *output = pango_text(output_str);
 #endif
 
 	json_object_object_add(output, "name", json_object_new_string("Battery"));
