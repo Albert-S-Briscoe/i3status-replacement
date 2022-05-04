@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 
 
-
+config.h
 junk/
 status
 battery/
