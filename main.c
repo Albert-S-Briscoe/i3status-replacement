@@ -5,7 +5,7 @@
 int main (int argc, char *argv[]) {
 	int status_length;
 //	json_object *sshblocks[2];
-	
+
 	// start infinite json
 #ifdef CLICKEVENTS
 	printf ("{\"version\":1,\"click_events\":true}\n[\n[],\n");
@@ -13,14 +13,14 @@ int main (int argc, char *argv[]) {
 	printf ("{\"version\":1}\n[\n[],\n");
 #endif
 	fflush(stdout);
-	
+
 	json_object *status_json = json_object_new_array();
 	if (!status_json)
 		fprintf(stderr, "error");
-	
+
 	json_object *separator = white_text(" | ");
 	#define PLACEHOLDER (white_text(""))
-	
+
 	json_object_array_add(status_json, get_ssh());
 #ifdef NETINTERFACE
 	json_object_array_add(status_json, PLACEHOLDER);	// 1st network interface
@@ -44,13 +44,13 @@ int main (int argc, char *argv[]) {
 	json_object_array_add(status_json, separator);
 	json_object_array_add(status_json, PLACEHOLDER);	// get_mem_info()	swap and warning on full memory/swap usage, built in seperators if not shortened
 	json_object_array_add(status_json, PLACEHOLDER);		// get_time()	built in seperators
-	
+
 	// update length every time it's changed. Not sure exactly how that'll work at the moment.
 	status_length = json_object_array_length(status_json);
-	
+
 	printf("%s,\n", json_object_to_json_string(status_json));
 	fflush(stdout);
-	
+
 	while (1) {
 		// every 30 seconds
 		json_object_array_put_idx(status_json, 0, get_ssh());
@@ -71,23 +71,22 @@ int main (int argc, char *argv[]) {
 #endif
 				json_object_array_put_idx(status_json, 1 + (BATTERIES * 2) + IPOFFSET, get_fs("/"));
 				json_object_array_put_idx(status_json, 3 + (BATTERIES * 2) + IPOFFSET, get_fs("/home"));
-				
+
 				json_object_array_put_idx(status_json, status_length - 2, get_mem_info());
 			}
-			
-			
-			
+
+
 			// every second
 			json_object_array_put_idx(status_json, status_length - 1, get_time());
-			
+
 //			fprintf(stdout, "%s,\n", json_object_to_json_string_ext(status_json, JSON_C_TO_STRING_PRETTY));
 			fprintf(stdout, "%s,\n", json_object_to_json_string(status_json));
 			fflush(stdout);
-			
+
 			sleep(1);
 		}
 	}
 	status_json = json_object_new_array();
-	
+
 	exit (EXIT_SUCCESS);
 }

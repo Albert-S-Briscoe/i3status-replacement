@@ -7,7 +7,7 @@ char *format_memory(double input) {
 	char suffix;
 	float value;
 	int prec = 0;
-	
+
 	if (input < 1024) {
 		suffix = 'K';
 		value = input;
@@ -21,19 +21,19 @@ char *format_memory(double input) {
 		suffix = 'T';
 		value = input / 1073741824;
 	}
-	
+
 	if (value < 10) {
 		prec = 2;
 	} else if (value < 100) {
 		prec = 1;
 	}
 
-#ifdef SMALLSCREEN	
+#ifdef SMALLSCREEN
 	sprintf(output, "%.*f%c", value, prec, suffix);
 #else
 	sprintf(output, "%.*f %c", value, prec, suffix);
 #endif
-	
+
 	return output;
 }
 
@@ -44,7 +44,7 @@ json_object *white_text(char *text) {
 //	json_object_object_add(text_json, "color", json_object_new_string("#ffffff"));
 //	json_object_object_add(text_json, "separator", json_object_new_boolean(0));
 	json_object_object_add(text_json, "separator_block_width", json_object_new_int(0));
-	
+
 	return text_json;
 }
 
@@ -55,7 +55,7 @@ json_object *error_text(char *text) {
 	json_object_object_add(text_json, "color", json_object_new_string("#ff0000"));
 //	json_object_object_add(text_json, "separator", json_object_new_boolean(0));
 	json_object_object_add(text_json, "separator_block_width", json_object_new_int(0));
-	
+
 	return text_json;
 }
 
@@ -66,7 +66,7 @@ json_object *color_text(char *text, char *color) {
 	json_object_object_add(text_json, "color", json_object_new_string(color));
 //	json_object_object_add(text_json, "separator", json_object_new_boolean(0));
 	json_object_object_add(text_json, "separator_block_width", json_object_new_int(0));
-	
+
 	return text_json;
 }
 
@@ -78,6 +78,6 @@ json_object *pango_text(char *text) {
 //	json_object_object_add(text_json, "separator", json_object_new_boolean(0));
 	json_object_object_add(text_json, "separator_block_width", json_object_new_int(0));
 	json_object_object_add(text_json, "markup", json_object_new_string("pango"));
-	
+
 	return text_json;
 }

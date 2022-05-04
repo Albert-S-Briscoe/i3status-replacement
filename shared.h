@@ -21,9 +21,17 @@
 #endif
 
 #ifdef BATTERYBAR
-#define BATTERYSEP (white_text(") | "))
+	#define BATTERYSEP (white_text(") | "))
+
+	#ifdef SHORTBATTERY
+		#define BATDIVISOR 14.0
+		#define BATSTRLEN 9
+	#else
+		#define BATDIVISOR 10.0
+		#define BATSTRLEN 12
+	#endif
 #else
-#define BATTERYSEP (separator)
+	#define BATTERYSEP (separator)
 #endif
 
 

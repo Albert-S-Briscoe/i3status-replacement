@@ -20,7 +20,7 @@ json_object *get_ssh() {
 	char output_str[100];
 	int addrs = 0;
 	char addr[30];
-	
+
 	// run `ss -tn` (lists all tcp connections) and get lines of stdout
 	FILE *pp;
 	pp = popen("ss -tn", "r");
@@ -32,16 +32,16 @@ json_object *get_ssh() {
 		line = fgets(buff, sizeof(buff), pp);
 		if (line == NULL)
 			break;
-		
+
 		// remove uninteresting fields
 		strtok(line, " "); // state
 		strtok(NULL, " "); // recv-q value
 		strtok(NULL, " "); // send-q value
-		
+
 		// check if local port is 22
 		if (strcmp(strchrnul(strtok(NULL, " "), ':'), ":22") != 0)
 			continue;
-		
+
 		if (addrs == 0) {
 			strcpy(addr, strtok(NULL, " "));	// get remote ip
 			strrchr(addr, ':')[0] = '\0';		// remove port number (by replacing the : with null)
@@ -49,15 +49,15 @@ json_object *get_ssh() {
 		addrs += 1;
 	}
 	pclose(pp);
-	
+
 	if (addrs == 0)
 		return white_text("");
-	
+
 	if (addrs == 1)
 		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %s</span> | ", addr);
 	else
 		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %d addrs</span> | ", addrs);
-	
+
 	return pango_text(output_str);
 }
 
@@ -68,25 +68,25 @@ json_object *get_ip(char *interface) {
 	char output_str[100];
 	int fd;
 	struct ifreq ifr;
-	
+
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
-	
+
 	ifr.ifr_addr.sa_family = AF_INET;
-	
+
 	// specify the interface
 	strncpy(ifr.ifr_name, interface, IFNAMSIZ-1);
-	
+
 	// system call
 	ioctl(fd, SIOCGIFADDR, &ifr);
-	
+
 	close(fd);
-	
+
 #ifdef SHOWINTERFACE
 	sprintf(output_str, "%s: %s", interface, inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 #else
 	sprintf(output_str, "%s", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 #endif
-	
+
 	return white_text(output_str);
 }
 #endif
