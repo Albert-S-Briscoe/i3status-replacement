@@ -82,9 +82,9 @@ json_object *get_ip(char *interface) {
 	close(fd);
 
 #ifdef SHOWINTERFACE
-	sprintf(output_str, "%s: %s", interface, inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+	sprintf(output_str, "%s: %s | ", interface, inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 #else
-	sprintf(output_str, "%s", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
+	sprintf(output_str, "%s | ", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 #endif
 
 	return white_text(output_str);

@@ -9,30 +9,25 @@ int main (int argc, char *argv[]) {
 		ssh_idx,
 #ifdef NETINTERFACE
 		net1_idx,
-		sep1_idx,
 #ifdef NETINTERFACE2
 		net2_idx,
-		sep2_idx,
 #endif
 #endif
 #if BATTERIES > 0
 		bat1_idx,
-		sep3_idx,
+		sep1_idx,
 #if BATTERIES > 1
 		bat2_idx,
-		sep4_idx,
+		sep2_idx,
 #endif
 #endif
 		fs1_idx,
-		sep5_idx,
 		fs2_idx,
-		sep6_idx,
 		mem_idx,
 		time_idx,
 		total_idx // array total, not an actual json object index
 	};
 
-	json_object *separator = white_text(" | ");
 	#define PLACEHOLDER white_text("")
 
 #ifdef BATTERYBAR
@@ -58,10 +53,8 @@ int main (int argc, char *argv[]) {
 	json_object_array_add(status_json, PLACEHOLDER);
 #ifdef NETINTERFACE
 	json_object_array_add(status_json, PLACEHOLDER);	// 1st network interface
-	json_object_array_add(status_json, separator);
 #ifdef NETINTERFACE2
 	json_object_array_add(status_json, PLACEHOLDER);	// 2nd network interface
-	json_object_array_add(status_json, separator);
 #endif
 #endif
 #if BATTERIES > 0
@@ -73,9 +66,7 @@ int main (int argc, char *argv[]) {
 #endif
 #endif
 	json_object_array_add(status_json, PLACEHOLDER);	// get_fs("/")
-	json_object_array_add(status_json, separator);
 	json_object_array_add(status_json, PLACEHOLDER);	// get_fs("/home")
-	json_object_array_add(status_json, separator);
 	json_object_array_add(status_json, PLACEHOLDER);	// get_mem_info()	swap and warning on full memory/swap usage, built in seperators if not shortened
 	json_object_array_add(status_json, PLACEHOLDER);		// get_time()	built in seperators
 

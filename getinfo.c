@@ -118,6 +118,7 @@ json_object *get_mem_info() {
 #endif
 }
 
+// Needs color
 json_object *get_fs(char *fs) {
 	struct statfs fs_info;
 	double total;
@@ -132,7 +133,7 @@ json_object *get_fs(char *fs) {
 
 	// format_memory can't be called twice by the same function
 	strcpy(total_str, format_memory(total));
-	sprintf(output_str, "%s %s/%s", fs, format_memory(free), total_str);
+	sprintf(output_str, "%s %s/%s | ", fs, format_memory(free), total_str);
 
 	return white_text(output_str);
 }
