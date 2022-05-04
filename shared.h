@@ -10,29 +10,4 @@
 #include "util.h"
 
 
-#ifdef NETINTERFACE
-	#ifdef NETINTERFACE2
-		#define IPOFFSET 4
-	#else
-		#define IPOFFSET 2
-	#endif
-#else
-	#define IPOFFSET 0
-#endif
-
-#ifdef BATTERYBAR
-	#define BATTERYSEP (white_text(") | "))
-
-	#ifdef SHORTBATTERY
-		#define BATDIVISOR 14.0
-		#define BATSTRLEN 9
-	#else
-		#define BATDIVISOR 10.0
-		#define BATSTRLEN 12
-	#endif
-#else
-	#define BATTERYSEP (separator)
-#endif
-
-
 #endif

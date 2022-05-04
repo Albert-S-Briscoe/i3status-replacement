@@ -3,6 +3,13 @@
 
 #include "shared.h"
 
+#ifdef SHORTBATTERY
+	#define BATDIVISOR 14.0
+	#define BATSTRLEN 9
+#else
+	#define BATDIVISOR 10.0
+	#define BATSTRLEN 12
+#endif
 
 extern json_object *get_mem_info();
 
