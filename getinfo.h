@@ -11,6 +11,12 @@
 	#define BATSTRLEN 12
 #endif
 
+#ifdef BATTERIES_ONE_INDEXED
+#define BATTERY_START 1
+#else
+#define BATTERY_START 0
+#endif
+
 extern json_object *get_mem_info();
 
 #if BATTERIES > 0

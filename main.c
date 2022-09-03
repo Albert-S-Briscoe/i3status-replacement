@@ -15,7 +15,6 @@ int main (int argc, char *argv[]) {
 		net2_idx,
 #endif
 #endif
-// battery ifdef mess:
 #if BATTERIES > 0
 		bat_idx,
 		tmp_idx = bat_idx + (BATTERIES * OBJPERBAT) - 1,

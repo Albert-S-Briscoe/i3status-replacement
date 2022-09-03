@@ -5,6 +5,9 @@
 // Any batteries that aren't connected/don't exist will show up as a grey 'N'.
 #define BATTERIES 2
 
+// Define if your batteries are 1-indexed
+//#define BATTERIES_ONE_INDEXED
+
 // Define to show battery percentage over a battery icon with colored level. Comment out to just show percent and state.
 #define BATTERYBAR
 

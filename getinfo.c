@@ -25,7 +25,7 @@ json_object *get_time() {
 	if (strftime(utc_time_str, sizeof(utc_time_str), "%T", tmp) == 0)
 		return error_text("strftime");
 
-	sprintf(time_str, " | UNIX %d | %s UTC | %s", unixtime, utc_time_str, local_time_str);
+	sprintf(time_str, " | UNIX %ld | %s UTC | %s", unixtime, utc_time_str, local_time_str);
 
 	return white_text(time_str);
 }
@@ -159,45 +159,29 @@ json_object *get_battery() {
 	char tmp_str2[20] = "";
 #endif
 
-	for (int i = 0; i < BATTERIES; i++) {
+	for (int i = BATTERY_START; i < (BATTERIES + BATTERY_START); i++) {
 		// get info from sysfs
 		// update charge_full less often?
 		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_full", i);
 		file_var = fopen(file_path, "r");
-		if (file_var == NULL) {
-#ifdef BATTERYBAR
-			json_object_array_add(objects, color_text("N", "#7f7f7f"));
-#else
-			json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
-#endif
-			continue;
-		}
-		fscanf(file_var, "%d", &charge_full);
+		if (file_var == NULL)
+			goto no_bat;
+		if (fscanf(file_var, "%d", &charge_full) != 1)
+			goto no_bat;
 		fclose(file_var);
 
 		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_now", i);
 		file_var = fopen(file_path, "r");
-		if (file_var == NULL) {
-#ifdef BATTERYBAR
-			json_object_array_add(objects, color_text("N", "#7f7f7f"));
-#else
-			json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
-#endif
-			continue;
-		}
-		fscanf(file_var, "%d", &charge_level);
+		if (file_var == NULL)
+			goto no_bat;
+		if (fscanf(file_var, "%d", &charge_level) != 1)
+			goto no_bat;
 		fclose(file_var);
 
 		sprintf(file_path, "/sys/class/power_supply/BAT%d/status", i);
 		file_var = fopen(file_path, "r");
-		if (file_var == NULL) {
-#ifdef BATTERYBAR
-			json_object_array_add(objects, color_text("N", "#7f7f7f"));
-#else
-			json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
-#endif
-			continue;
-		}
+		if (file_var == NULL)
+			goto no_bat;
 		state = fgetc(file_var);
 		fclose(file_var);
 
@@ -255,6 +239,15 @@ json_object *get_battery() {
 #endif
 		json_object_object_add(output, "name", json_object_new_string("Battery"));
 		json_object_array_add(objects, output);
+		continue;
+
+	no_bat:
+#ifdef BATTERYBAR
+		json_object_array_add(objects, color_text("N", "#7f7f7f"));
+#else
+		json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
+#endif
+		continue;
 	}
 	return objects;
 }

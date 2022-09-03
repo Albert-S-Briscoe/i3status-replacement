@@ -29,9 +29,9 @@ char *format_memory(double input) {
 	}
 
 #ifdef SMALLSCREEN
-	sprintf(output, "%.*f%c", value, prec, suffix);
+	sprintf(output, "%.*f%c", prec, value, suffix);
 #else
-	sprintf(output, "%.*f %c", value, prec, suffix);
+	sprintf(output, "%.*f %c", prec, value, suffix);
 #endif
 
 	return output;

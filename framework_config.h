@@ -3,13 +3,13 @@
 
 // Number of batteries to show, 0 to disable. I am not aware of a maximum (100 works fine for me).
 // Any batteries that aren't connected/don't exist will show up as a grey 'N'.
-#define BATTERIES 0
+#define BATTERIES 1
 
 // Define if your batteries are 1-indexed
-//#define BATTERIES_ONE_INDEXED
+#define BATTERIES_ONE_INDEXED
 
 // Define to show battery percentage over a battery icon with colored level. Comment out to just show percent and state.
-//#define BATTERYBAR
+#define BATTERYBAR
 
 // Define to shorten the battery icon by about 1/4.
 //#define SHORTBATTERY
@@ -27,13 +27,13 @@
 // Network interface settings:
 
 // Network interface to display ip of. Comment out to disable.
-#define NETINTERFACE "enp8s0"
+#define NETINTERFACE "wlan0"
 
 // 2nd network interface. Comment to disable
 //#define NETINTERFACE2 "wlan1"
 
 // Define to prefix ip address(es) with network interface name(s).
-//#define SHOWINTERFACE
+#define SHOWINTERFACE
 
 
 // Experimental:
