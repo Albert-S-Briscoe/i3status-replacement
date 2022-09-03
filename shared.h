@@ -9,5 +9,10 @@
 #include "config.h"
 #include "util.h"
 
+#ifdef BATTERIES_ONE_INDEXED
+#define BATTERY_START 1
+#else
+#define BATTERY_START 0
+#endif
 
 #endif

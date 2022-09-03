@@ -75,7 +75,7 @@ int main (int argc, char *argv[]) {
 			if (i % 10 == 0) {
 #if BATTERIES > 0
 				tempobject = get_battery();
-				for (int x = 0; i < json_object_array_length(tempobject); i++) {
+				for (int x = 0; x < BATTERIES; x++) {
 					json_object_array_put_idx(status_json, bat_idx + i * OBJPERBAT, json_object_array_get_idx(tempobject, i));
 				}
 #endif
@@ -87,7 +87,37 @@ int main (int argc, char *argv[]) {
 			json_object_array_put_idx(status_json, time_idx, get_time());
 
 //			fprintf(stdout, "%s,\n", json_object_to_json_string_ext(status_json, JSON_C_TO_STRING_PRETTY));
-			fprintf(stdout, "%s,\n", json_object_to_json_string(status_json));
+//			fprintf(stdout, "%s,\n", json_object_to_json_string(status_json));
+
+
+
+
+
+			fprintf(stdout, "[\n");
+			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, ssh_idx)));
+#ifdef NETINTERFACE
+			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, net1_idx)));
+#ifdef NETINTERFACE2
+			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, net2_idx)));
+#endif
+#endif
+#if BATTERIES > 0
+			for (int x = 0; x < BATTERIES; x++) {
+				fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, bat_idx + x * OBJPERBAT)));
+#ifdef BATTERYBAR
+				fprintf(stdout, "{\"full_text\":\") | \",\"separator_block_width\":0},\n");
+#endif
+			}
+#endif
+			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, fs1_idx)));
+			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, fs2_idx)));
+			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, mem_idx)));
+			fprintf(stdout, "%s\n", json_object_to_json_string(json_object_array_get_idx(status_json, time_idx)));
+			fprintf(stdout, "],\n\n");
+
+
+
+
 			fflush(stdout);
 
 			sleep(1);
