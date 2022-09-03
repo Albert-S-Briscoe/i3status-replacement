@@ -71,7 +71,7 @@ int get_ssh(char* output, size_t output_size) {
 // copied most of this, basically no idea what's going on here, should be good enough tho
 // get ip of specific network interface
 #ifdef NETINTERFACE
-json_object *get_ip(char *interface) {
+void get_ip(char *interface, char* output, size_t output_size) {
 	char output_str[100];
 	int fd;
 	struct ifreq ifr;
@@ -94,6 +94,6 @@ json_object *get_ip(char *interface) {
 	sprintf(output_str, "%s | ", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 #endif
 
-	return white_text_old(output_str);
+	white_text(output_str, output, output_size);
 }
 #endif

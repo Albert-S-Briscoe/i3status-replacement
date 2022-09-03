@@ -5,7 +5,7 @@
 
 
 #ifdef NETINTERFACE
-extern json_object *get_ip(char *interface);
+extern void get_ip(char *interface, char* output, size_t output_size);
 #endif
 
 extern int get_ssh(char* output, size_t output_size);

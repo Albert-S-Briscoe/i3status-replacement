@@ -16,13 +16,6 @@ int main (int argc, char *argv[]) {
 #endif
 #endif
 	enum {
-		ssh_idx,
-#ifdef NETINTERFACE
-		net1_idx,
-#ifdef NETINTERFACE2
-		net2_idx,
-#endif
-#endif
 #if BATTERIES > 0
 		bat_idx,
 		tmp_idx = bat_idx + (BATTERIES * OBJPERBAT) - 1,
@@ -48,13 +41,6 @@ int main (int argc, char *argv[]) {
 
 
 	// this mess basically just sets up the array and adds the separator objects
-	json_object_array_add(status_json, PLACEHOLDER);
-#ifdef NETINTERFACE
-	json_object_array_add(status_json, PLACEHOLDER);	// 1st network interface
-#ifdef NETINTERFACE2
-	json_object_array_add(status_json, PLACEHOLDER);	// 2nd network interface
-#endif
-#endif
 	for (int i = 0; i < BATTERIES; i++) {
 		json_object_array_add(status_json, PLACEHOLDER);
 #ifdef BATTERYBAR
@@ -71,12 +57,11 @@ int main (int argc, char *argv[]) {
 
 	while (1) {
 		// every 30 seconds
-//		json_object_array_put_idx(status_json, ssh_idx, get_ssh());
 		ssh_present = get_ssh(ssh_str, 256);
 #ifdef NETINTERFACE
-		json_object_array_put_idx(status_json, net1_idx, get_ip(NETINTERFACE));
+		get_ip(NETINTERFACE, net1_str, 256);
 #ifdef NETINTERFACE2
-		json_object_array_put_idx(status_json, net2_idx, get_ip(NETINTERFACE2));
+		get_ip(NETINTERFACE2, net2_str, 256);
 #endif
 #endif
 		for (int i = 0; i < 30; i++) {
@@ -106,9 +91,9 @@ int main (int argc, char *argv[]) {
 			if (ssh_present > 0)
 				fprintf(stdout, "%s,\n", ssh_str);
 #ifdef NETINTERFACE
-			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, net1_idx)));
+			fprintf(stdout, "%s,\n", net1_str);
 #ifdef NETINTERFACE2
-			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, net2_idx)));
+			fprintf(stdout, "%s,\n", net2_str);
 #endif
 #endif
 #if BATTERIES > 0
