@@ -16,7 +16,7 @@ functions to get network related info. I generally like this code less, so I put
 // I don't think I want to use this permanently, but whatever, I probably will. This took a while to figure out and it seems to work well, might as well use it.
 // lets me know when a ssh client is connected. if it's only one, shows the ip, if multiple, shows number of clients. also works for sftp.
 // just rewrote most of the 1am code.
-json_object *get_ssh() {
+int get_ssh(char* output, size_t output_size) {
 	char output_str[100];
 	int addrs = 0;
 	char addr[30];
@@ -24,8 +24,11 @@ json_object *get_ssh() {
 	// run `ss -tn` (lists all tcp connections) and get lines of stdout
 	FILE *pp;
 	pp = popen("ss -tn", "r");
-	if (pp == NULL)
-		return white_text("");
+	if (pp == NULL) {
+		// no connections
+		output[0] = '\0';
+		return 0;
+	}
 	while (1) {
 		char *line;
 		char buff[200];
@@ -50,15 +53,19 @@ json_object *get_ssh() {
 	}
 	pclose(pp);
 
-	if (addrs == 0)
-		return white_text("");
+	if (addrs == 0) {
+		// no connections to the ssh server
+		output[0] = '\0';
+		return 0;
+	}
 
 	if (addrs == 1)
-		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %s</span> | ", addr);
+		sprintf(output_str, "<span color=\\\"#ff7f00\\\">SSH: %s</span> | ", addr);
 	else
-		sprintf(output_str, "<span color=\"#ff7f00\">SSH: %d addrs</span> | ", addrs);
-
-	return pango_text(output_str);
+		sprintf(output_str, "<span color=\\\"#ff7f00\\\">SSH: %d connections</span> | ", addrs);
+	
+	pango_text(output_str, output, output_size);
+	return 1;
 }
 
 // copied most of this, basically no idea what's going on here, should be good enough tho
@@ -87,6 +94,6 @@ json_object *get_ip(char *interface) {
 	sprintf(output_str, "%s | ", inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr));
 #endif
 
-	return white_text(output_str);
+	return white_text_old(output_str);
 }
 #endif

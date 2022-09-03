@@ -8,7 +8,7 @@
 extern json_object *get_ip(char *interface);
 #endif
 
-extern json_object *get_ssh();
+extern int get_ssh(char* output, size_t output_size);
 
 
 #endif

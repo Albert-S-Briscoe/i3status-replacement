@@ -15,19 +15,19 @@ json_object *get_time() {
 
 	tmp = localtime(&unixtime);
 	if (tmp == NULL)
-		return error_text("localtime");
+		return error_text_old("localtime");
 	if (strftime(local_time_str, sizeof(local_time_str), "%Z %Y/%m/%d %l:%M:%S %p", tmp) == 0)
-		return error_text("strftime");
+		return error_text_old("strftime");
 
 	tmp = gmtime(&unixtime);
 	if (tmp == NULL)
-		return error_text("gmtime");
+		return error_text_old("gmtime");
 	if (strftime(utc_time_str, sizeof(utc_time_str), "%T", tmp) == 0)
-		return error_text("strftime");
+		return error_text_old("strftime");
 
 	sprintf(time_str, " | UNIX %ld | %s UTC | %s", unixtime, utc_time_str, local_time_str);
 
-	return white_text(time_str);
+	return white_text_old(time_str);
 }
 
 // get used ram and swap, change colors based on ram usage
@@ -87,7 +87,7 @@ json_object *get_mem_info() {
 		else
 			color = "#ff7f00";
 
-		return color_text(line, color);
+		return color_text_old(line, color);
 	}
 #endif
 #endif
@@ -106,7 +106,7 @@ json_object *get_mem_info() {
 
 #ifdef RAMSUMMARY
 	sprintf(line, "RAM %.1f%% (%s)", memperc, format_memory((double)usedram));
-	return color_text(line, color);
+	return color_text_old(line, color);
 #else
 	strcpy(used_str, format_memory((double)usedram));
 	strcpy(free_str, format_memory((double)freeram));
@@ -114,7 +114,7 @@ json_object *get_mem_info() {
 	sprintf(line, "<span color=\"%1$s\">Used: %2$s</span> | "
 				  "<span color=\"%1$s\">Free: %3$s</span> | "
 				  "<span color=\"%1$s\">Avail.: %4$s</span>", color, used_str, free_str, avail_str);
-	return pango_text(line);
+	return pango_text_old(line);
 #endif
 }
 
@@ -135,7 +135,7 @@ json_object *get_fs(char *fs) {
 	strcpy(total_str, format_memory(total));
 	sprintf(output_str, "%s %s/%s | ", fs, format_memory(free), total_str);
 
-	return white_text(output_str);
+	return white_text_old(output_str);
 }
 
 #if BATTERIES > 0
@@ -196,11 +196,11 @@ json_object *get_battery() {
 
 #ifndef BATTERYBAR
 		if (state == 'E') {
-			json_object_array_add(objects, color_text("Empty", "#bfbfbf"));
+			json_object_array_add(objects, color_text_old("Empty", "#bfbfbf"));
 			continue;
 		}
 		if (state == 'F') {
-			json_object_array_add(objects, white_text("Full"));
+			json_object_array_add(objects, white_text_old("Full"));
 			continue;
 		}
 #endif
@@ -231,11 +231,11 @@ json_object *get_battery() {
 		tmp_str1[charged_chars] = '\0';				// shorten first string to match where 2nd starts
 
 		sprintf(output_str, "<span bgcolor=\"%s7f\">%s</span>%s", color, tmp_str1, tmp_str2);
-		json_object *output = pango_text(output_str);
+		json_object *output = pango_text_old(output_str);
 		json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
 #else
 		sprintf(output_str, "<span color=\"%s\">%c %.1f%%</span> | ", color, state, percent);
-		json_object *output = pango_text(output_str);
+		json_object *output = pango_text_old(output_str);
 #endif
 		json_object_object_add(output, "name", json_object_new_string("Battery"));
 		json_object_array_add(objects, output);
@@ -243,9 +243,9 @@ json_object *get_battery() {
 
 	no_bat:
 #ifdef BATTERYBAR
-		json_object_array_add(objects, color_text("N", "#7f7f7f"));
+		json_object_array_add(objects, color_text_old("N", "#7f7f7f"));
 #else
-		json_object_array_add(objects, pango_text("<span color=\"#7f7f7f\">N</span> | "));
+		json_object_array_add(objects, pango_text_old("<span color=\"#7f7f7f\">N</span> | "));
 #endif
 		continue;
 	}

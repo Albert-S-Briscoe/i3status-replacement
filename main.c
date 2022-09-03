@@ -3,10 +3,18 @@
 #include "main.h"
 
 
-#define PLACEHOLDER white_text("")
+#define PLACEHOLDER white_text_old("")
 
 int main (int argc, char *argv[]) {
 	json_object *tempobject;
+	char ssh_str[256];
+	int ssh_present;
+#ifdef NETINTERFACE
+	char net1_str[256];
+#ifdef NETINTERFACE2
+	char net2_str[256];
+#endif
+#endif
 	enum {
 		ssh_idx,
 #ifdef NETINTERFACE
@@ -50,7 +58,7 @@ int main (int argc, char *argv[]) {
 	for (int i = 0; i < BATTERIES; i++) {
 		json_object_array_add(status_json, PLACEHOLDER);
 #ifdef BATTERYBAR
-		json_object_array_add(status_json, white_text(") | "));
+		json_object_array_add(status_json, white_text_old(") | "));
 #endif
 	}
 	json_object_array_add(status_json, PLACEHOLDER);	// get_fs("/")
@@ -63,7 +71,8 @@ int main (int argc, char *argv[]) {
 
 	while (1) {
 		// every 30 seconds
-		json_object_array_put_idx(status_json, ssh_idx, get_ssh());
+//		json_object_array_put_idx(status_json, ssh_idx, get_ssh());
+		ssh_present = get_ssh(ssh_str, 256);
 #ifdef NETINTERFACE
 		json_object_array_put_idx(status_json, net1_idx, get_ip(NETINTERFACE));
 #ifdef NETINTERFACE2
@@ -94,7 +103,8 @@ int main (int argc, char *argv[]) {
 
 
 			fprintf(stdout, "[\n");
-			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, ssh_idx)));
+			if (ssh_present > 0)
+				fprintf(stdout, "%s,\n", ssh_str);
 #ifdef NETINTERFACE
 			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, net1_idx)));
 #ifdef NETINTERFACE2
@@ -105,7 +115,7 @@ int main (int argc, char *argv[]) {
 			for (int x = 0; x < BATTERIES; x++) {
 				fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, bat_idx + x * OBJPERBAT)));
 #ifdef BATTERYBAR
-				fprintf(stdout, "{\"full_text\":\") | \",\"separator_block_width\":0},\n");
+				fprintf(stdout, WHITE_TEXT(") | ") ",\n");
 #endif
 			}
 #endif
