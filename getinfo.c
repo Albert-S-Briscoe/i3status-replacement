@@ -139,9 +139,7 @@ json_object *get_fs(char *fs) {
 }
 
 #if BATTERIES > 0
-json_object *get_battery() {
-	json_object *objects = json_object_new_array();
-
+void get_batteries(char output[][BAT_STR_SIZE], size_t output_size) {
 	FILE *file_var;
 	char file_path[100];
 
@@ -159,10 +157,10 @@ json_object *get_battery() {
 	char tmp_str2[20] = "";
 #endif
 
-	for (int i = BATTERY_START; i < (BATTERIES + BATTERY_START); i++) {
+	for (int i = 0; i < BATTERIES; i++) {
 		// get info from sysfs
 		// update charge_full less often?
-		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_full", i);
+		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_full", i + BATTERY_START);
 		file_var = fopen(file_path, "r");
 		if (file_var == NULL)
 			goto no_bat;
@@ -170,7 +168,7 @@ json_object *get_battery() {
 			goto no_bat;
 		fclose(file_var);
 
-		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_now", i);
+		sprintf(file_path, "/sys/class/power_supply/BAT%d/charge_now", i + BATTERY_START);
 		file_var = fopen(file_path, "r");
 		if (file_var == NULL)
 			goto no_bat;
@@ -178,7 +176,7 @@ json_object *get_battery() {
 			goto no_bat;
 		fclose(file_var);
 
-		sprintf(file_path, "/sys/class/power_supply/BAT%d/status", i);
+		sprintf(file_path, "/sys/class/power_supply/BAT%d/status", i + BATTERY_START);
 		file_var = fopen(file_path, "r");
 		if (file_var == NULL)
 			goto no_bat;
@@ -196,11 +194,11 @@ json_object *get_battery() {
 
 #ifndef BATTERYBAR
 		if (state == 'E') {
-			json_object_array_add(objects, color_text_old("Empty", "#bfbfbf"));
+			color_text("Empty", "#bfbfbf", output[i], output_size);
 			continue;
 		}
 		if (state == 'F') {
-			json_object_array_add(objects, white_text_old("Full"));
+			white_text("Full", output[i], output_size);
 			continue;
 		}
 #endif
@@ -230,25 +228,28 @@ json_object *get_battery() {
 		strcpy(tmp_str2, tmp_str1 + charged_chars);	// copy specified length of blank space to other string
 		tmp_str1[charged_chars] = '\0';				// shorten first string to match where 2nd starts
 
-		sprintf(output_str, "<span bgcolor=\"%s7f\">%s</span>%s", color, tmp_str1, tmp_str2);
-		json_object *output = pango_text_old(output_str);
-		json_object_object_add(output, "border", json_object_new_string("#bfbfbf"));
+		sprintf(output_str, "<span bgcolor=\\\"%s7f\\\">%s</span>%s", color, tmp_str1, tmp_str2);
+		pango_text(output_str, output[i], output_size);
+
+		// add extra objects
+		output[i][strlen(output[i])-1] = '\0'; // remove the } from the json so we can add more objects
+		sprintf(output_str, ",\"border\":\"#bfbfbf\",\"name\":\"Battery\"},\n");
+		strcat(output[i], output_str);
+		strcat(output[i], WHITE_TEXT(") | "));
 #else
-		sprintf(output_str, "<span color=\"%s\">%c %.1f%%</span> | ", color, state, percent);
-		json_object *output = pango_text_old(output_str);
+		sprintf(output_str, "<span color=\\\"%s\\\">%c %.1f%%</span> | ", color, state, percent);
+		pango_text(output_str, output[i], output_size);
+
+		// add extra objects
+		output[i][strlen(output[i])-1] = '\0'; // remove the } from the json so we can add more objects
+		sprintf(output_str, ",\"name\":\"Battery\"}");
+		strcat(output[i], output_str);
 #endif
-		json_object_object_add(output, "name", json_object_new_string("Battery"));
-		json_object_array_add(objects, output);
 		continue;
 
 	no_bat:
-#ifdef BATTERYBAR
-		json_object_array_add(objects, color_text_old("N", "#7f7f7f"));
-#else
-		json_object_array_add(objects, pango_text_old("<span color=\"#7f7f7f\">N</span> | "));
-#endif
+		pango_text("<span color=\\\"#7f7f7f\\\">N</span> | ", output[i], output_size);
 		continue;
 	}
-	return objects;
 }
 #endif

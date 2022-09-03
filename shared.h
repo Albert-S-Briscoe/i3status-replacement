@@ -15,4 +15,6 @@
 #define BATTERY_START 0
 #endif
 
+#define BAT_STR_SIZE 256
+
 #endif

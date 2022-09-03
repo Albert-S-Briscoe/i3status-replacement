@@ -14,7 +14,7 @@
 extern json_object *get_mem_info();
 
 #if BATTERIES > 0
-extern json_object *get_battery();
+extern void get_batteries(char output[][BAT_STR_SIZE], size_t output_size);
 #endif
 
 extern json_object *get_time();

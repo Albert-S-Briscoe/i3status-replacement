@@ -15,6 +15,11 @@ int main (int argc, char *argv[]) {
 	char net2_str[256];
 #endif
 #endif
+#if BATTERIES > 0
+	char bat_str[BATTERIES][BAT_STR_SIZE];
+#endif
+
+
 	enum {
 #if BATTERIES > 0
 		bat_idx,
@@ -68,10 +73,7 @@ int main (int argc, char *argv[]) {
 			// every 10 seconds
 			if (i % 10 == 0) {
 #if BATTERIES > 0
-				tempobject = get_battery();
-				for (int x = 0; x < BATTERIES; x++) {
-					json_object_array_put_idx(status_json, bat_idx + i * OBJPERBAT, json_object_array_get_idx(tempobject, i));
-				}
+				get_batteries(bat_str, 256); // bat_str is a char[][]
 #endif
 				json_object_array_put_idx(status_json, fs1_idx, get_fs("/"));
 				json_object_array_put_idx(status_json, fs2_idx, get_fs("/home"));
@@ -98,10 +100,7 @@ int main (int argc, char *argv[]) {
 #endif
 #if BATTERIES > 0
 			for (int x = 0; x < BATTERIES; x++) {
-				fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, bat_idx + x * OBJPERBAT)));
-#ifdef BATTERYBAR
-				fprintf(stdout, WHITE_TEXT(") | ") ",\n");
-#endif
+				fprintf(stdout, "%s,\n", bat_str[x]);
 			}
 #endif
 			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, fs1_idx)));
