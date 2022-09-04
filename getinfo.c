@@ -6,28 +6,40 @@
 
 
 // get time and display it in a few ways
-json_object *get_time() {
+void get_time(char* output, size_t output_size) {
 	char time_str[100]; // " | UNIX xxxxxxxxxx |  UTC | " +8+27 is 63
 	char utc_time_str[10]; // "xx:xx:xx" is 8
 	char local_time_str[40]; // "xxx xxxx/xx/xx  xx:xx:xx xx" is 27
+	char* error;
 	struct tm *tmp;
 	time_t unixtime = time(NULL);
 
 	tmp = localtime(&unixtime);
-	if (tmp == NULL)
-		return error_text_old("localtime");
-	if (strftime(local_time_str, sizeof(local_time_str), "%Z %Y/%m/%d %l:%M:%S %p", tmp) == 0)
-		return error_text_old("strftime");
+	if (tmp == NULL) {
+		error = "Internal error: localtime";
+		goto error;
+	}
+	if (strftime(local_time_str, sizeof(local_time_str), "%Z %Y/%m/%d %l:%M:%S %p", tmp) == 0) {
+		error = "Internal error: strftime";
+		goto error;
+	}
 
 	tmp = gmtime(&unixtime);
-	if (tmp == NULL)
-		return error_text_old("gmtime");
-	if (strftime(utc_time_str, sizeof(utc_time_str), "%T", tmp) == 0)
-		return error_text_old("strftime");
+	if (tmp == NULL) {
+		error = "Internal error: gmtime";
+		goto error;
+	}
+	if (strftime(utc_time_str, sizeof(utc_time_str), "%T", tmp) == 0) {
+		error = "Internal error: strftime";
+		goto error;
+	}
 
 	sprintf(time_str, " | UNIX %ld | %s UTC | %s", unixtime, utc_time_str, local_time_str);
 
-	return white_text_old(time_str);
+	white_text(time_str, output, output_size);
+	return;
+error:
+	error_text(error, output, output_size);
 }
 
 // get used ram and swap, change colors based on ram usage
