@@ -20,10 +20,9 @@ int main (int argc, char *argv[]) {
 #endif
 	char fs1_str[256];
 	char fs2_str[256];
-
+	char mem_str[256];
 
 	enum {
-		mem_idx,
 		time_idx,
 		total_idx // array total, not an actual json object index
 	};
@@ -42,7 +41,6 @@ int main (int argc, char *argv[]) {
 
 
 	// this mess basically just sets up the array and adds the separator objects
-	json_object_array_add(status_json, PLACEHOLDER);	// get_mem_info()	swap and warning on full memory/swap usage, built in separators if not shortened
 	json_object_array_add(status_json, PLACEHOLDER);	// get_time()	built in separators
 
 	if (json_object_array_length(status_json) != total_idx)
@@ -65,7 +63,7 @@ int main (int argc, char *argv[]) {
 #endif
 				get_fs("/", fs1_str, 256);
 				get_fs("/home", fs2_str, 256);
-				json_object_array_put_idx(status_json, mem_idx, get_mem_info());
+				get_mem_info(mem_str, 256);
 			}
 			// every second
 			json_object_array_put_idx(status_json, time_idx, get_time());
@@ -93,7 +91,7 @@ int main (int argc, char *argv[]) {
 #endif
 			fprintf(stdout, "%s,\n", fs1_str);
 			fprintf(stdout, "%s,\n", fs2_str);
-			fprintf(stdout, "%s,\n", json_object_to_json_string(json_object_array_get_idx(status_json, mem_idx)));
+			fprintf(stdout, "%s,\n", mem_str);
 			fprintf(stdout, "%s\n", json_object_to_json_string(json_object_array_get_idx(status_json, time_idx)));
 			fprintf(stdout, "],\n\n");
 
