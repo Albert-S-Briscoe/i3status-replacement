@@ -23,4 +23,6 @@ extern void pango_text(char* text, char* output, size_t output_size);
 
 extern char *format_memory(double input);
 
+extern void json_escape(char* in, char* out);
+
 #endif

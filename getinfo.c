@@ -112,18 +112,19 @@ json_object *get_mem_info() {
 	strcpy(free_str, format_memory((double)freeram));
 	strcpy(avail_str, format_memory((double)available));
 	sprintf(line, "<span color=\"%1$s\">Used: %2$s</span> | "
-				  "<span color=\"%1$s\">Free: %3$s</span> | "
-				  "<span color=\"%1$s\">Avail.: %4$s</span>", color, used_str, free_str, avail_str);
+	              "<span color=\"%1$s\">Free: %3$s</span> | "
+	              "<span color=\"%1$s\">Avail.: %4$s</span>", color, used_str, free_str, avail_str);
 	return pango_text_old(line);
 #endif
 }
 
 // Needs color
-json_object *get_fs(char *fs) {
+void get_fs(char *fs, char* output, size_t output_size) {
 	struct statfs fs_info;
 	double total;
 	double free;
 	char output_str[100];
+	char name_str[100];
 	char total_str[10];
 
 	statfs(fs, &fs_info);
@@ -133,9 +134,10 @@ json_object *get_fs(char *fs) {
 
 	// format_memory can't be called twice by the same function
 	strcpy(total_str, format_memory(total));
-	sprintf(output_str, "%s %s/%s | ", fs, format_memory(free), total_str);
+	json_escape(fs, name_str);
+	sprintf(output_str, "%s %s\\/%s | ", name_str, format_memory(free), total_str);
 
-	return white_text_old(output_str);
+	white_text(output_str, output, output_size);
 }
 
 #if BATTERIES > 0
@@ -228,7 +230,7 @@ void get_batteries(char output[][BAT_STR_SIZE], size_t output_size) {
 		strcpy(tmp_str2, tmp_str1 + charged_chars);	// copy specified length of blank space to other string
 		tmp_str1[charged_chars] = '\0';				// shorten first string to match where 2nd starts
 
-		sprintf(output_str, "<span bgcolor=\\\"%s7f\\\">%s</span>%s", color, tmp_str1, tmp_str2);
+		sprintf(output_str, "<span bgcolor=\\\"%s7f\\\">%s<\\/span>%s", color, tmp_str1, tmp_str2);
 		pango_text(output_str, output[i], output_size);
 
 		// add extra objects
@@ -237,7 +239,7 @@ void get_batteries(char output[][BAT_STR_SIZE], size_t output_size) {
 		strcat(output[i], output_str);
 		strcat(output[i], WHITE_TEXT(") | "));
 #else
-		sprintf(output_str, "<span color=\\\"%s\\\">%c %.1f%%</span> | ", color, state, percent);
+		sprintf(output_str, "<span color=\\\"%s\\\">%c %.1f%%<\\/span> | ", color, state, percent);
 		pango_text(output_str, output[i], output_size);
 
 		// add extra objects
@@ -248,7 +250,7 @@ void get_batteries(char output[][BAT_STR_SIZE], size_t output_size) {
 		continue;
 
 	no_bat:
-		pango_text("<span color=\\\"#7f7f7f\\\">N</span> | ", output[i], output_size);
+		pango_text("<span color=\\\"#7f7f7f\\\">N<\\/span> | ", output[i], output_size);
 		continue;
 	}
 }

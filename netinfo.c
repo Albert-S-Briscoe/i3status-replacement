@@ -60,9 +60,9 @@ int get_ssh(char* output, size_t output_size) {
 	}
 
 	if (addrs == 1)
-		sprintf(output_str, "<span color=\\\"#ff7f00\\\">SSH: %s</span> | ", addr);
+		sprintf(output_str, "<span color=\\\"#ff7f00\\\">SSH: %s<\\/span> | ", addr);
 	else
-		sprintf(output_str, "<span color=\\\"#ff7f00\\\">SSH: %d connections</span> | ", addrs);
+		sprintf(output_str, "<span color=\\\"#ff7f00\\\">SSH: %d connections<\\/span> | ", addrs);
 	
 	pango_text(output_str, output, output_size);
 	return 1;

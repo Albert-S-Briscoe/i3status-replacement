@@ -18,6 +18,6 @@ extern void get_batteries(char output[][BAT_STR_SIZE], size_t output_size);
 #endif
 
 extern json_object *get_time();
-extern json_object *get_fs(char *fs);
+extern void get_fs(char *fs, char* output, size_t output_size);
 
 #endif
